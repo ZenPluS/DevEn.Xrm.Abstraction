@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="DevEn.Xrm.Abstraction.Plugins.UnitTests/DevEn.Xrm.Abstraction.Plugins.UnitTests.csproj" />
+  <Project Path="DevEn.Xrm.Abstraction.Plugins/DevEn.Xrm.Abstraction.Plugins.csproj" />
+</Solution>
