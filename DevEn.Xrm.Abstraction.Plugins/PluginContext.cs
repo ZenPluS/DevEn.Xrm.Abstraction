@@ -30,14 +30,11 @@ namespace DevEn.Xrm.Abstraction.Plugins
             _tracingService = InitializeLazyServiceProvider<ITracingService>();
         }
 
-        private Lazy<T> InitializeLazyServiceProvider<T>()
-            => new Lazy<T>(GetService<T>);
-
+        private Lazy<T> InitializeLazyServiceProvider<T>() => new Lazy<T>(GetService<T>);
         private Lazy<IOrganizationService> InitializeLazyOrganizationService(Guid id)
             => new Lazy<IOrganizationService>(() => ServiceFactory.CreateOrganizationService(id));
 
-        private T GetService<T>()
-            => (T)_serviceProvider.GetService(typeof(T));
+        private T GetService<T>() => (T)_serviceProvider.GetService(typeof(T));
 
         public T GetInputParameter<T>(string name)
         {
@@ -51,6 +48,13 @@ namespace DevEn.Xrm.Abstraction.Plugins
             if (Context.OutputParameters?.Contains(name) == true)
                 return (T)Context.OutputParameters[name];
             return default;
+        }
+
+        public void SetOutputParameter(string name, object value)
+        {
+            if (Context.OutputParameters == null)
+                return;
+            Context.OutputParameters[name] = value;
         }
 
         public Entity GetTargetEntity()

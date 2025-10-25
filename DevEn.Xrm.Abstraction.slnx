@@ -1,4 +1,6 @@
 <Solution>
-  <Project Path="DevEn.Xrm.Abstraction.Plugins.UnitTests/DevEn.Xrm.Abstraction.Plugins.UnitTests.csproj" />
-  <Project Path="DevEn.Xrm.Abstraction.Plugins/DevEn.Xrm.Abstraction.Plugins.csproj" />
+  <Project Path="DevEn.Xrm.Abstraction.Plugins.UnitTests/DevEn.Xrm.Abstraction.Plugins.UnitTests.csproj" Id="e72139d5-956a-4d70-a2e9-c985c24af8f7" />
+  <Project Path="DevEn.Xrm.Abstraction.Plugins/DevEn.Xrm.Abstraction.Plugins.csproj" Id="f37d7a27-590c-41f8-a146-51ebd37a3528" />
+  <Project Path="DevEn.Xrm.Abstraction.Workflows.UnitTests/DevEn.Xrm.Abstraction.Workflows.UnitTests.csproj" Id="9fa9645a-63b4-498a-8c11-467d38253f0d" />
+  <Project Path="DevEn.Xrm.Abstraction.Workflows/DevEn.Xrm.Abstraction.Workflows.csproj" Id="1d4c8309-84ac-4f66-abe6-64a408a012dc" />
 </Solution>

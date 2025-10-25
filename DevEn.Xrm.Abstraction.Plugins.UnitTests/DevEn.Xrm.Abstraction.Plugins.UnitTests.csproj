@@ -100,6 +100,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasePluginTests.cs" />
+    <Compile Include="CustomApiPluginTests.cs" />
     <Compile Include="Stubs\FakeOrganizationService.cs" />
     <Compile Include="Stubs\FakeOrganizationServiceFactory.cs" />
     <Compile Include="Stubs\FakePluginExecutionContext.cs" />
