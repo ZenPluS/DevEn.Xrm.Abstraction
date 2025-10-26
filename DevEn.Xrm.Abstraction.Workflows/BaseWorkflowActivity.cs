@@ -7,13 +7,37 @@ using Microsoft.Xrm.Sdk.Workflow;
 
 namespace DevEn.Xrm.Abstraction.Workflows
 {
-    public abstract class BaseWorkflowActivity : CodeActivity
+    /// <summary>
+    /// Base abstract workflow activity providing standardized execution flow:
+    /// tracing start, validating context via <see cref="ValidationExpression"/>, invoking derived logic and handling exceptions.
+    /// Derive and implement <see cref="ValidationExpression"/> and <see cref="ExecuteWorkflow(IWorkflowActivityContext, CodeActivityContext)"/>.
+    /// </summary>
+    public abstract class BaseWorkflowActivity
+        : CodeActivity
     {
+        /// <summary>
+        /// Header used in trace and exception messages. Defaults to the concrete type name.
+        /// </summary>
         protected virtual string Header => GetType().Name;
+
+        /// <summary>
+        /// Expression used to validate whether the current <see cref="IWorkflowContext"/> should execute this activity.
+        /// Must return true to proceed; false skips execution.
+        /// </summary>
         protected abstract Expression<Func<IWorkflowContext, bool>> ValidationExpression { get; }
 
+        /// <summary>
+        /// Core business logic for the workflow activity. Implement this in derived classes.
+        /// </summary>
+        /// <param name="context">Wrapper exposing workflow services and context.</param>
+        /// <param name="executionContext">Underlying WF execution context.</param>
         protected abstract void ExecuteWorkflow(IWorkflowActivityContext context, CodeActivityContext executionContext);
 
+        /// <summary>
+        /// Workflow runtime entry point. Wraps the execution context, traces start, validates, and calls <see cref="ExecuteWorkflow"/>.
+        /// Handles and rethrows exceptions as <see cref="InvalidWorkflowException"/>.
+        /// </summary>
+        /// <param name="executionContext">WF execution context provided by runtime.</param>
         protected override void Execute(CodeActivityContext executionContext)
         {
             var wrapper = new WorkflowActivityContext(executionContext);
@@ -39,6 +63,13 @@ namespace DevEn.Xrm.Abstraction.Workflows
             }
         }
 
+        /// <summary>
+        /// Evaluates <see cref="ValidationExpression"/> against the current workflow context.
+        /// Returns true if execution should continue; false otherwise. Traces validation errors.
+        /// </summary>
+        /// <param name="ctx">Workflow context.</param>
+        /// <param name="tracing">Tracing service for diagnostics.</param>
+        /// <returns>True if valid; false if not.</returns>
         protected virtual bool IsContextValid(IWorkflowContext ctx, ITracingService tracing)
         {
             if (ValidationExpression == null)
@@ -53,19 +84,6 @@ namespace DevEn.Xrm.Abstraction.Workflows
                 tracing.Trace($"{Header} - ValidationExpression exception: {ex.Message}");
                 return false;
             }
-        }
-    }
-
-    public class InvalidWorkflowException : Exception
-    {
-        public InvalidWorkflowException(string message) : base(message) { }
-
-        public InvalidWorkflowException() : base()
-        {
-        }
-
-        public InvalidWorkflowException(string message, Exception innerException) : base(message, innerException)
-        {
         }
     }
 }

@@ -100,12 +100,13 @@
   <ItemGroup>
     <Compile Include="BaseWorkflowActivity.cs" />
     <Compile Include="Core\IWorkflowActivityContext.cs" />
+    <Compile Include="Exceptions\InvalidWorkflowException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WorkflowActivityContext.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
