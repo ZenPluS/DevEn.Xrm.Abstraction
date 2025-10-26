@@ -70,9 +70,6 @@ namespace DevEn.Xrm.Abstraction.Workflows
         /// Sets the value of an output argument if the argument is not null.
         /// </summary>
         public void SetOutput<T>(OutArgument<T> argument, CodeActivityContext ctx, T value)
-        {
-            if (argument != null)
-                argument.Set(ctx, value);
-        }
+            => argument?.Set(ctx, value);
     }
 }

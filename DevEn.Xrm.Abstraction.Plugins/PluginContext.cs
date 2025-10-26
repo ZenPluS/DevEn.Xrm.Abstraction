@@ -85,7 +85,7 @@ namespace DevEn.Xrm.Abstraction.Plugins
         }
 
         /// <summary>
-        /// Obtains the Target entity or converts a Target EntityReference into an entity shell with Id and LogicalName.
+        /// Obtains the Target entity or converts a Target EntityReference into an entity shell with id and LogicalName.
         /// Returns null if Target is absent or unsupported type.
         /// </summary>
         public Entity GetTargetEntity()

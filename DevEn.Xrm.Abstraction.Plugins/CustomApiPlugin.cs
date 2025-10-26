@@ -1,6 +1,5 @@
 using System;
 using System.Linq.Expressions;
-using DevEn.Xrm.Abstraction.Plugins.Core;
 using Microsoft.Xrm.Sdk;
 
 namespace DevEn.Xrm.Abstraction.Plugins
