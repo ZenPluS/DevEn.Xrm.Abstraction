@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>36f5c26c-ba28-4f81-9d8d-8b5f0db36dad</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>DevEn.Xrm.Abstraction.Workflows</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Core\IWorkflowActivityContext.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)Exceptions\InvalidWorkflowException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BaseWorkflowActivity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WorkflowActivityContext.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Core\" />
+	<Folder Include="$(MSBuildThisFileDirectory)Exceptions\" />
+  </ItemGroup>
+</Project>
