@@ -3,7 +3,6 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Workflow;
 using System;
 using System.Activities;
-using System.Runtime.Remoting.Contexts;
 
 namespace DevEn.Xrm.Abstraction.Workflows
 {

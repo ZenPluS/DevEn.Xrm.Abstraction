@@ -9,13 +9,16 @@
     <Import_RootNamespace>DevEn.Xrm.Abstraction.Plugins</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)abstract\ExpressionPluginContextValidator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\IBasePlugin.cs" />
-	<Compile Include="$(MSBuildThisFileDirectory)Core\IPluginContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\IPluginContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BasePlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)core\IPluginContextValidator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CustomApiPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Core\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Abstract\" />
   </ItemGroup>
 </Project>

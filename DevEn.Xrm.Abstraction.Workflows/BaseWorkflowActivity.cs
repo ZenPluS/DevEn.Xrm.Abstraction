@@ -9,8 +9,8 @@ namespace DevEn.Xrm.Abstraction.Workflows
 {
     /// <summary>
     /// Base abstract workflow activity providing standardized execution flow:
-    /// tracing start, validating context via <see cref="ValidationExpression"/>, invoking derived logic and handling exceptions.
-    /// Derive and implement <see cref="ValidationExpression"/> and <see cref="ExecuteWorkflow(IWorkflowActivityContext, CodeActivityContext)"/>.
+    /// tracing start, validating context via <see cref="ValidationExpression"/> or <see cref="Validator"/>, invoking derived logic and handling exceptions.
+    /// Derive and implement <see cref="ValidationExpression"/> (or override <see cref="Validator"/>) and <see cref="ExecuteWorkflow(IWorkflowActivityContext, CodeActivityContext)"/>.
     /// </summary>
     public abstract class BaseWorkflowActivity
         : CodeActivity
@@ -21,10 +21,16 @@ namespace DevEn.Xrm.Abstraction.Workflows
         protected virtual string Header => GetType().Name;
 
         /// <summary>
-        /// Expression used to validate whether the current <see cref="IWorkflowContext"/> should execute this activity.
-        /// Must return true to proceed; false skips execution.
+        /// Optional validator object offering richer metadata and cached compilation.
+        /// Override to supply instead of <see cref="ValidationExpression"/>.
         /// </summary>
-        protected abstract Expression<Func<IWorkflowContext, bool>> ValidationExpression { get; }
+        protected virtual IWorkflowContextValidator Validator => null;
+
+        /// <summary>
+        /// Expression used to validate whether the current <see cref="IWorkflowContext"/> should execute this activity.
+        /// Must return true to proceed; false skips execution. Ignored if <see cref="Validator"/> provided.
+        /// </summary>
+        protected virtual Expression<Func<IWorkflowContext, bool>> ValidationExpression => Validator?.Expression;
 
         /// <summary>
         /// Core business logic for the workflow activity. Implement this in derived classes.
@@ -64,7 +70,7 @@ namespace DevEn.Xrm.Abstraction.Workflows
         }
 
         /// <summary>
-        /// Evaluates <see cref="ValidationExpression"/> against the current workflow context.
+        /// Evaluates <see cref="Validator"/> or <see cref="ValidationExpression"/> against the current workflow context.
         /// Returns true if execution should continue; false otherwise. Traces validation errors.
         /// </summary>
         /// <param name="ctx">Workflow context.</param>
@@ -72,16 +78,18 @@ namespace DevEn.Xrm.Abstraction.Workflows
         /// <returns>True if valid; false if not.</returns>
         protected virtual bool IsContextValid(IWorkflowContext ctx, ITracingService tracing)
         {
-            if (ValidationExpression == null)
-                return true;
+            if (Validator != null)
+                return SafeEval(() => Validator.IsValid(ctx), Validator.Description, tracing);
 
-            try
-            {
-                return ValidationExpression.Compile()(ctx);
-            }
+            return ValidationExpression == null || SafeEval(() => ValidationExpression.Compile()(ctx), "ValidationExpression", tracing);
+        }
+
+        private bool SafeEval(Func<bool> eval, string label, ITracingService tracing)
+        {
+            try { return eval(); }
             catch (Exception ex)
             {
-                tracing.Trace($"{Header} - ValidationExpression exception: {ex.Message}");
+                tracing.Trace($"{Header} - {label} exception: {ex.Message}");
                 return false;
             }
         }

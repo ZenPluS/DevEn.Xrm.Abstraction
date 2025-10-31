@@ -17,12 +17,6 @@ namespace DevEn.Xrm.Abstraction.Plugins
         private ITracingService _tracing;
 
         /// <summary>
-        /// Expression used to validate whether the current <see cref="IPluginExecutionContext"/> matches plugin criteria
-        /// (e.g. message name and entity). Return true to allow execution. Return false to skip.
-        /// </summary>
-        public abstract Expression<Func<IPluginExecutionContext, bool>> ValidationExpression { get; }
-
-        /// <summary>
         /// Header label used in tracing and error messages. Defaults to the derived class name.
         /// </summary>
         public virtual string Header => GetType().Name;
@@ -65,21 +59,38 @@ namespace DevEn.Xrm.Abstraction.Plugins
         public abstract void ExecutePlugin(IPluginContext context);
 
         /// <summary>
-        /// Evaluates the <see cref="ValidationExpression"/> against the current execution context.
+        /// Validation logic implementation for the plugin. Provides a way to plug in custom validation
+        /// logic and messages via the <see cref="IPluginContextValidator"/> interface.
+        /// </summary>
+        protected virtual IPluginContextValidator Validator => null;
+
+        /// <summary>
+        /// Expression used to validate whether the current <see cref="IPluginExecutionContext"/> matches plugin criteria
+        /// (e.g. message name and entity). Return true to allow execution. Return false to skip.
+        /// </summary>
+        public virtual Expression<Func<IPluginExecutionContext, bool>> ValidationExpression =>
+            Validator?.Expression;
+
+        /// <summary>
+        /// Evaluates the <see cref="ValidationExpression"/> and <see cref="Validator"/> against the current execution context.
         /// Returns true if execution should proceed, false otherwise. Traces any validation exceptions.
         /// </summary>
         public virtual bool IsContextValid()
         {
-            if (ValidationExpression == null)
-                return true;
+            if (Validator != null)
+                return SafeEval(() => Validator.IsValid(_context), Validator.Description);
+            return ValidationExpression == null || SafeEval(() => ValidationExpression.Compile()(_context), "ValidationExpression");
+        }
 
+        private bool SafeEval(Func<bool> eval, string label)
+        {
             try
             {
-                return ValidationExpression.Compile()(_context);
+                return eval();
             }
             catch (Exception ex)
             {
-                _tracing.Trace($"ValidationExpression exception: {ex.Message}");
+                _tracing?.Trace($"Validation failure ({label}): {ex.Message}");
                 return false;
             }
         }

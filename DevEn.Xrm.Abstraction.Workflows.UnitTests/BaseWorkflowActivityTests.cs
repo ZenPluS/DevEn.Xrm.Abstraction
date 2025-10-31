@@ -3,9 +3,10 @@ using System;
 using System.Activities;
 using System.Linq;
 using System.Linq.Expressions;
-using DevEn.Xrm.Abstraction.Workflows;
 using DevEn.Xrm.Abstraction.Workflows.UnitTests.Stubs;
 using Microsoft.Xrm.Sdk.Workflow;
+using DevEn.Xrm.Abstraction.Workflows.Abstract;
+using DevEn.Xrm.Abstraction.Workflows.Core;
 
 namespace DevEn.Xrm.Abstraction.Workflows.UnitTests
 {
@@ -32,9 +33,36 @@ namespace DevEn.Xrm.Abstraction.Workflows.UnitTests
             }
         }
 
-        private WorkflowInvoker BuildInvoker(object activity, FakeWorkflowContext wfCtx, FakeTracingService tracing, FakeOrganizationService service)
+        private class ContactWorkflowValidator : ExpressionWorkflowContextValidator
         {
-            var invoker = new WorkflowInvoker(activity as System.Activities.Activity);
+            public ContactWorkflowValidator() : base(ctx => ctx.PrimaryEntityName == "contact" && ctx.MessageName == "Update") { }
+            public override string Description => "Update contact";
+        }
+
+        private class ValidatorActivity : BaseWorkflowActivity
+        {
+            public bool Ran;
+            protected override IWorkflowContextValidator Validator => new ContactWorkflowValidator();
+            protected override void ExecuteWorkflow(Core.IWorkflowActivityContext context, CodeActivityContext executionContext) => Ran = true;
+        }
+
+        private class ThrowingWorkflowValidator : IWorkflowContextValidator
+        {
+            public string Description => "Throwing WF";
+            public Expression<Func<IWorkflowContext, bool>> Expression => _ => true; // not used
+            public bool IsValid(IWorkflowContext context) => throw new InvalidOperationException("wf boom");
+        }
+
+        private class ThrowingValidatorActivity : BaseWorkflowActivity
+        {
+            public bool Ran;
+            protected override IWorkflowContextValidator Validator => new ThrowingWorkflowValidator();
+            protected override void ExecuteWorkflow(Core.IWorkflowActivityContext context, CodeActivityContext executionContext) => Ran = true;
+        }
+
+        private WorkflowInvoker BuildInvoker(Activity activity, FakeWorkflowContext wfCtx, FakeTracingService tracing, FakeOrganizationService service)
+        {
+            var invoker = new WorkflowInvoker(activity);
             invoker.Extensions.Add(() => tracing);
             invoker.Extensions.Add(() => wfCtx);
             invoker.Extensions.Add(() => new FakeOrganizationServiceFactory(service));
@@ -52,12 +80,8 @@ namespace DevEn.Xrm.Abstraction.Workflows.UnitTests
                 UserId = Guid.NewGuid(),
                 InitiatingUserId = Guid.NewGuid()
             };
-            var service = new FakeOrganizationService();
             var act = new DummyActivity();
-            var invoker = BuildInvoker(act, wfCtx, tracing, service);
-
-            invoker.Invoke();
-
+            BuildInvoker(act, wfCtx, tracing, new FakeOrganizationService()).Invoke();
             Assert.IsTrue(act.Ran);
         }
 
@@ -72,14 +96,60 @@ namespace DevEn.Xrm.Abstraction.Workflows.UnitTests
                 UserId = Guid.NewGuid(),
                 InitiatingUserId = Guid.NewGuid()
             };
-            var service = new FakeOrganizationService();
             var act = new InvalidActivity();
-            var invoker = BuildInvoker(act, wfCtx, tracing, service);
-
-            invoker.Invoke();
-
+            BuildInvoker(act, wfCtx, tracing, new FakeOrganizationService()).Invoke();
             Assert.IsFalse(act.Ran);
             Assert.IsTrue(tracing.Messages.Any(m => m.Contains("Context not valid")), "Trace should indicate invalid context.");
+        }
+
+        [TestMethod]
+        public void Validator_Activity_Should_Run_When_Validator_Passes()
+        {
+            var tracing = new FakeTracingService();
+            var wfCtx = new FakeWorkflowContext
+            {
+                PrimaryEntityName = "contact",
+                MessageName = "Update",
+                UserId = Guid.NewGuid(),
+                InitiatingUserId = Guid.NewGuid()
+            };
+            var act = new ValidatorActivity();
+            BuildInvoker(act, wfCtx, tracing, new FakeOrganizationService()).Invoke();
+            Assert.IsTrue(act.Ran);
+        }
+
+        [TestMethod]
+        public void Validator_Activity_Should_Skip_When_Validator_Fails()
+        {
+            var tracing = new FakeTracingService();
+            var wfCtx = new FakeWorkflowContext
+            {
+                PrimaryEntityName = "account", // wrong entity
+                MessageName = "Update",
+                UserId = Guid.NewGuid(),
+                InitiatingUserId = Guid.NewGuid()
+            };
+            var act = new ValidatorActivity();
+            BuildInvoker(act, wfCtx, tracing, new FakeOrganizationService()).Invoke();
+            Assert.IsFalse(act.Ran);
+            Assert.IsTrue(tracing.Messages.Any(m => m.Contains("Context not valid")), "Trace should indicate invalid context.");
+        }
+
+        [TestMethod]
+        public void Validator_Exception_Should_Be_Caught_And_Skip_Execution()
+        {
+            var tracing = new FakeTracingService();
+            var wfCtx = new FakeWorkflowContext
+            {
+                PrimaryEntityName = "contact",
+                MessageName = "Update",
+                UserId = Guid.NewGuid(),
+                InitiatingUserId = Guid.NewGuid()
+            };
+            var act = new ThrowingValidatorActivity();
+            BuildInvoker(act, wfCtx, tracing, new FakeOrganizationService()).Invoke();
+            Assert.IsFalse(act.Ran, "Execution should be skipped on validator exception.");
+            Assert.IsTrue(tracing.Messages.Any(m => m.Contains("ValidationExpression") || m.Contains("Throwing")), "Trace should show validation failure.");
         }
     }
 }

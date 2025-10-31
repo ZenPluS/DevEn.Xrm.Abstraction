@@ -26,9 +26,8 @@ namespace DevEn.Xrm.Abstraction.Plugins
         /// Validates that the current execution context message matches the Custom API name and,
         /// if specified, that the primary entity matches the bound entity logical name.
         /// </summary>
-        public override Expression<Func<IPluginExecutionContext, bool>> ValidationExpression
-            => ctx => ctx.MessageName.Equals(CustomApiName, StringComparison.OrdinalIgnoreCase)
-                   && (string.IsNullOrEmpty(BoundEntityLogicalName)
-                       || ctx.PrimaryEntityName.Equals(BoundEntityLogicalName, StringComparison.OrdinalIgnoreCase));
+        public override Expression<Func<IPluginExecutionContext, bool>> ValidationExpression => ctx
+            => ctx.MessageName.Equals(CustomApiName, StringComparison.OrdinalIgnoreCase) &&
+               (string.IsNullOrEmpty(BoundEntityLogicalName) || ctx.PrimaryEntityName.Equals(BoundEntityLogicalName, StringComparison.OrdinalIgnoreCase));
     }
 }

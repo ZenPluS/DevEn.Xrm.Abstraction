@@ -9,13 +9,14 @@
     <Import_RootNamespace>DevEn.Xrm.Abstraction.Workflows</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Abstract\ExpressionWorkflowContextValidator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\IWorkflowActivityContext.cs" />
-	<Compile Include="$(MSBuildThisFileDirectory)Exceptions\InvalidWorkflowException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\IWorkflowContextValidator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\InvalidWorkflowException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BaseWorkflowActivity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WorkflowActivityContext.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Core\" />
-	<Folder Include="$(MSBuildThisFileDirectory)Exceptions\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Exceptions\" />
   </ItemGroup>
 </Project>

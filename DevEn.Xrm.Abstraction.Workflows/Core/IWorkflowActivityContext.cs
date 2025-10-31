@@ -1,3 +1,4 @@
+using System.Activities;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Workflow;
 
@@ -31,7 +32,7 @@ namespace DevEn.Xrm.Abstraction.Workflows.Core
         /// <typeparam name="T">Argument value type.</typeparam>
         /// <param name="argument">InArgument to read.</param>
         /// <param name="ctx">WF execution context.</param>
-        T GetInput<T>(System.Activities.InArgument<T> argument, System.Activities.CodeActivityContext ctx);
+        T GetInput<T>(InArgument<T> argument, CodeActivityContext ctx);
 
         /// <summary>
         /// Assigns a value to an output argument in the workflow execution context if the argument is not null.
@@ -40,6 +41,6 @@ namespace DevEn.Xrm.Abstraction.Workflows.Core
         /// <param name="argument">OutArgument to set.</param>
         /// <param name="ctx">WF execution context.</param>
         /// <param name="value">Value to assign.</param>
-        void SetOutput<T>(System.Activities.OutArgument<T> argument, System.Activities.CodeActivityContext ctx, T value);
+        void SetOutput<T>(OutArgument<T> argument, CodeActivityContext ctx, T value);
     }
 }
