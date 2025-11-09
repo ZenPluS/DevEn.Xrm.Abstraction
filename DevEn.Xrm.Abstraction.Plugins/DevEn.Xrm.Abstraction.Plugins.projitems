@@ -10,15 +10,26 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)abstract\ExpressionPluginContextValidator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Abstract\MultiFilterPluginContextValidator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\IBasePlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\IExecutionDiagnostics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\IPluginContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BasePlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)core\IPluginContextValidator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\PluginErrorCategory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CustomApiPlugin.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Diagnostics\ExecutionDiagnostics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FilteredPluginBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\PluginContextExtension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\PluginExceptionHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CustomAttributes\PluginFilterAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RetryingOrganizationService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Core\" />
-    <Folder Include="$(MSBuildThisFileDirectory)Abstract\" />
+    <Folder Include="$(MSBuildThisFileDirectory)CustomAttributes\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Diagnostics\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Extensions\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Helpers\" />
   </ItemGroup>
 </Project>

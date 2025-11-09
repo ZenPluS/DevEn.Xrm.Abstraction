@@ -8,42 +8,35 @@ using Microsoft.Xrm.Sdk.Workflow;
 namespace DevEn.Xrm.Abstraction.Workflows
 {
     /// <summary>
-    /// Base abstract workflow activity providing standardized execution flow:
-    /// tracing start, validating context via <see cref="ValidationExpression"/> or <see cref="Validator"/>, invoking derived logic and handling exceptions.
-    /// Derive and implement <see cref="ValidationExpression"/> (or override <see cref="Validator"/>) and <see cref="ExecuteWorkflow(IWorkflowActivityContext, CodeActivityContext)"/>.
+    /// Foundation workflow activity implementing the common execution pipeline:
+    /// 1. Wrap execution context
+    /// 2. Trace start
+    /// 3. Validate (expression or validator object)
+    /// 4. Invoke derived <see cref="ExecuteWorkflow"/> if valid
+    /// 5. Catch and wrap errors as <see cref="InvalidWorkflowException"/>
+    /// Derived classes provide either a <see cref="ValidationExpression"/> or an <see cref="IWorkflowContextValidator"/> plus the core logic.
     /// </summary>
     public abstract class BaseWorkflowActivity
         : CodeActivity
     {
-        /// <summary>
-        /// Header used in trace and exception messages. Defaults to the concrete type name.
-        /// </summary>
+        /// <summary>Short label used in tracing and error wrapping. Defaults to concrete type name.</summary>
         protected virtual string Header => GetType().Name;
 
-        /// <summary>
-        /// Optional validator object offering richer metadata and cached compilation.
-        /// Override to supply instead of <see cref="ValidationExpression"/>.
-        /// </summary>
+        /// <summary>Optional validator abstraction; if supplied its expression supersedes <see cref="ValidationExpression"/>.</summary>
         protected virtual IWorkflowContextValidator Validator => null;
 
         /// <summary>
-        /// Expression used to validate whether the current <see cref="IWorkflowContext"/> should execute this activity.
-        /// Must return true to proceed; false skips execution. Ignored if <see cref="Validator"/> provided.
+        /// Validation predicate executed (compiled) against <see cref="IWorkflowContext"/> when no explicit validator instance is provided.
+        /// Return true to continue execution; false skips.
         /// </summary>
         protected virtual Expression<Func<IWorkflowContext, bool>> ValidationExpression => Validator?.Expression;
 
-        /// <summary>
-        /// Core business logic for the workflow activity. Implement this in derived classes.
-        /// </summary>
-        /// <param name="context">Wrapper exposing workflow services and context.</param>
-        /// <param name="executionContext">Underlying WF execution context.</param>
+        /// <summary>Derived classes implement their business logic here (only invoked when validation passes).</summary>
         protected abstract void ExecuteWorkflow(IWorkflowActivityContext context, CodeActivityContext executionContext);
 
         /// <summary>
-        /// Workflow runtime entry point. Wraps the execution context, traces start, validates, and calls <see cref="ExecuteWorkflow"/>.
-        /// Handles and rethrows exceptions as <see cref="InvalidWorkflowException"/>.
+        /// Orchestrates validation, execution and exception handling.
         /// </summary>
-        /// <param name="executionContext">WF execution context provided by runtime.</param>
         protected override void Execute(CodeActivityContext executionContext)
         {
             var wrapper = new WorkflowActivityContext(executionContext);
@@ -70,12 +63,9 @@ namespace DevEn.Xrm.Abstraction.Workflows
         }
 
         /// <summary>
-        /// Evaluates <see cref="Validator"/> or <see cref="ValidationExpression"/> against the current workflow context.
-        /// Returns true if execution should continue; false otherwise. Traces validation errors.
+        /// Performs safe validation using either <see cref="Validator"/> or compiled <see cref="ValidationExpression"/>.
+        /// Any exception during validation is traced and treated as a failure (skip).
         /// </summary>
-        /// <param name="ctx">Workflow context.</param>
-        /// <param name="tracing">Tracing service for diagnostics.</param>
-        /// <returns>True if valid; false if not.</returns>
         protected virtual bool IsContextValid(IWorkflowContext ctx, ITracingService tracing)
         {
             if (Validator != null)

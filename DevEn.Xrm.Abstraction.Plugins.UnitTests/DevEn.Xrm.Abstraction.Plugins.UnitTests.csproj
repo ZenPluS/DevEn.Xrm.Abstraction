@@ -151,7 +151,13 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExecutionDiagnosticsTests.cs" />
+    <Compile Include="FilteredPluginBaseTests.cs" />
+    <Compile Include="MultiFilterPluginContextValidatorTests.cs" />
+    <Compile Include="PluginContextExtensionsTests.cs" />
+    <Compile Include="PluginExceptionHelperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RetryingOrganizationServiceTests.cs" />
     <Compile Include="Stubs\FakeOrganizationService.cs" />
     <Compile Include="Stubs\FakeOrganizationServiceFactory.cs" />
     <Compile Include="Stubs\FakePluginExecutionContext.cs" />

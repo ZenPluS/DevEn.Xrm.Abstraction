@@ -154,6 +154,7 @@
     <Compile Include="Stubs\FakeTracingService.cs" />
     <Compile Include="Stubs\FakeWorkflowContext.cs" />
     <Compile Include="BaseWorkflowActivityTests.cs" />
+    <Compile Include="TypedWorkflowActivityTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Core\IWorkflowContextValidator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\InvalidWorkflowException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BaseWorkflowActivity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypedWorkflowActivity.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WorkflowActivityContext.cs" />
   </ItemGroup>
   <ItemGroup>
